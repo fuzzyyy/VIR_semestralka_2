@@ -8,8 +8,8 @@ default_dir = "data/"
 
 pickle_template = {"joins": (),
                    "camera_position": (),
-                   "camera_angle": (),
-                   "image": None}
+                   "image_pos": (),
+                   "image": ()}
 
 
 def print_joint_info(robot):
@@ -60,21 +60,23 @@ def get_joints(robot):
     return states
 
 def get_camera_pos(robot):
-    return ()
+    pos, orn = my_getLinkState(robot)
+    orn = p.getEulerFromQuaternion(orn)
 
-def get_camera_angle(robot):
-    return ()
+    #print(pos + orn)
+    return pos + orn
+
 
 def get_image(robot):
     return None
 
 
 def save_data(robot, num, dir=default_dir):
-    data = pickle_template.copy()
+    #data = pickle_template.copy()
+    data = {}
 
     data["joints"] = get_joints(robot)
     data["camera_pos"] = get_camera_pos(robot)
-    data["camera_angle"] = get_camera_angle(robot)
     data["image"] = get_image(robot)
 
     name = f'data{num}'
@@ -88,7 +90,13 @@ def compare_joints(robot, file_name):
         print(f"joint {i}: pickle: {data['joints'][i]}     original: {joints[i]}     difference: {diff}")
 
 
+def my_getLinkState(robot):
+    position, orientation, _,_,_,_ = p.getLinkState(robot, p.getNumJoints(robot) - 1, computeForwardKinematics=True)
+ #   _, _, _, _, position, orientation = p.getLinkState(robot, p.getNumJoints(robot) - 1, computeForwardKinematics=True)
+    return position, orientation
+
 if __name__ == '__main__':          # test funkcionality on example data
+    '''
     sample_size = 10
 
     joint_data = [[(0.1, 0.2, (0.3, 0.4, 0.5, 0.6, 0.7, 0.8), 0.9) for i in range(jointCount)] for j in range(sample_size)]
@@ -97,7 +105,7 @@ if __name__ == '__main__':          # test funkcionality on example data
     data1["joins"] = joint_data[0]
 
     save_pickle(data1, 'data1')
-
-    data2 = load_pickle('data1')
+    '''
+    data2 = load_pickle('data16')
 
     print(data2)
