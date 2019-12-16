@@ -216,7 +216,7 @@ def create_dataset():
            #         img = my_getCameraImage(view_matrix, projection_matrix)
                     img, pos1, camera_vector = img_wrapper(kukaId)
             #        time.sleep(3)
-            #        d.save_data(kukaId, i)
+                    d.save_data(kukaId, i)
 
 
 
