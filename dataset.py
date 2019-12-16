@@ -6,7 +6,7 @@ import numpy as np
 import os, glob, random
 import math
 
-import data_management as d
+#import data_management as d
 
 def print_joint_info(robot):
     print(f"joint info for robot {robot}")
