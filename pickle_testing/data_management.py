@@ -68,6 +68,7 @@ def get_camera_pos(robot):
 
 
 def get_image(robot):
+    #TODO: all
     return None
 
 

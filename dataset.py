@@ -7,6 +7,7 @@ import os, glob, random
 import math
 
 from pickle_testing import data_management as d
+import generate_camera_coords
 
 def print_joint_info(robot):
     print(f"joint info for robot {robot}")
@@ -55,22 +56,6 @@ def img_wrapper(robot):
 def my_getCameraImage(view_matrix, projection_matrix):
     return p.getCameraImage(128, 128, view_matrix, projection_matrix)
 
-
-#from https://towardsdatascience.com/a-python-tutorial-on-generating-and-plotting-a-3d-guassian-distribution-8c6ec6c41d03
-def py_bivariate_normal_pdf(domain, mean, variance):
-    X = [[-mean+x*variance for x in range(int((-domain+mean)//variance),
-                                                   int((domain+mean)//variance)+1)]
-                  for _ in range(int((-domain+mean)//variance),
-                                 int((domain+mean)//variance)+1)]
-    Y = [*map(list, zip(*X))]
-    R = [[math.sqrt(a**2 + b**2) for a, b in zip(c, d)] for c, d in zip(X, Y)]
- #   Z = [[(1. / math.sqrt(0.5 * math.pi)) * math.exp(-11.25*r**2) for r in r_sub] for r_sub in R] #30cm
-#    Z = [[(1. / math.sqrt(2 * math.pi)) * math.exp(-.5 * r ** 2) for r in r_sub] for r_sub in R]
-    Z = [[(1. / math.sqrt(0.5 * math.pi)) * math.exp(-13.5 * r ** 2) for r in r_sub] for r_sub in R]#20cm
-    X = [*map(lambda a: [b+mean for b in a], X)]
-    Y = [*map(lambda a: [b+mean for b in a], Y)]
-    return  np.array(X), np.array(Y), np.array(Z)
-
 def gaussian(x, mu=0.0, sigma=1.0):
     x = float(x - mu) / sigma
     return math.exp(-x*x/2.0) / math.sqrt(2.0*math.pi) / sigma
@@ -108,6 +93,9 @@ def calc_angle(a, b):
     c = math.sqrt(pow(a,2)+pow(b,2))
     alpha = math.asin(a/c)
     return alpha
+
+def camera_coords_in_img_coords(): #TODO:
+    return
 
 def create_dataset():
     length_img = 0.15
@@ -221,25 +209,25 @@ def create_dataset():
 
 
 
+if __name__ == '__main__':
+    projection_matrix = calc_projection_matrix()
 
-projection_matrix = calc_projection_matrix()
+    physicsClient = p.connect(p.GUI)
+    p.setAdditionalSearchPath(pybullet_data.getDataPath())
+    p.setGravity(0, 10, -10)
+    planeId = p.loadURDF("plane.urdf")
 
-physicsClient = p.connect(p.GUI)
-p.setAdditionalSearchPath(pybullet_data.getDataPath())
-p.setGravity(0, 10, -10)
-planeId = p.loadURDF("plane.urdf")
+    kukaId = p.loadURDF("kuka_iiwa/model.urdf", [0, 0, 0], useFixedBase=True)
 
-kukaId = p.loadURDF("kuka_iiwa/model.urdf", [0, 0, 0], useFixedBase=True)
+    useRealTimeSimulation = 0
+    p.setRealTimeSimulation(useRealTimeSimulation)
 
-useRealTimeSimulation = 0
-p.setRealTimeSimulation(useRealTimeSimulation)
+    print_joint_info(kukaId)
+    print_joint_states(kukaId)
+    print_link_states(kukaId)
 
-print_joint_info(kukaId)
-print_joint_states(kukaId)
-print_link_states(kukaId)
+    numjoints = p.getNumJoints(kukaId)
+    positions = [0] * numjoints
 
-numjoints = p.getNumJoints(kukaId)
-positions = [0] * numjoints
-
-create_dataset()
+    create_dataset()
 
