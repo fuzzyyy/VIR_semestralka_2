@@ -29,7 +29,7 @@ sample_size = 1000
 při image_size=128:
     0.05MB / sample 
     2000 samples/min
-# 
+'''
 
 image_size = 128
 # -------------------
