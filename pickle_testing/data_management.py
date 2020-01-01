@@ -72,7 +72,7 @@ def get_image(robot):
     return None
 
 
-def save_data(robot, num, dir=default_dir):
+def save_data(robot, num, img=None, dir=default_dir):
     #data = pickle_template.copy()
     data = {}
 

@@ -1,13 +1,8 @@
-import pybullet as p
 import pybullet_data
 import time
-import numpy as np
-
-import os, glob, random
-import math
 
 from pickle_testing import data_management as d
-from camera_angle_generator import *
+from angle_testing.camera_angle_generator import *
 from generate_camera_coords import *
 
 def print_joint_info(robot):
@@ -194,7 +189,7 @@ def create_dataset():
 
                     if i < 2:
                         joints = p.calculateInverseKinematics(kukaId, 6, pos, orn, maxNumIterations=100)
-                        #          add_const(joints)
+                        add_const(joints)
 
                         view_matrix, camvec = calc_view_matrix(pos, orn)
                         #      img = my_getCameraImage(view_matrix, projection_matrix)
