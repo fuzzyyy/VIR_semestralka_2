@@ -55,7 +55,7 @@ def get_camera_pos(robot):
 
 def get_camera_angle(robot):
     pos, orn = my_getLinkState(robot)
-    return orn
+    return tuple(orn/np.linalg.norm(orn, ord=2))
 
 
 def get_image(img_data):
@@ -90,7 +90,6 @@ def save_data(robot, num, img_data, dir=default_dir):
     img_size, img = get_image(img_data)
     data["image_size"] = img_size
     data["image"] = img
-
     name = f'data{num}'
     save_pickle(data, name, dir)
     print(f'Dataset {name} saved successfully!')

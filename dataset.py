@@ -19,19 +19,14 @@ z_img = 0.15
 
 arm_distance = 0.30   # z distance from image
 
-x_width = 0.01  # width_img/2
-y_width = 0.01  # length_img/2
+x_width = width_img / 2  # width_img/2
+y_width = length_img / 2  # length_img/2
 z_width = 0.01
 angles_width = 0.1
 
-sample_size = 1000
-'''
-při image_size=128:
-    0.05MB / sample 
-    2000 samples/min
-'''
+sample_size = 12000
 
-image_size = 128
+image_size = 224
 # -------------------
 
 
@@ -85,7 +80,7 @@ def my_getLinkState(robot):
 
 
 def my_getCameraImage(view_matrix, projection_matrix):
-    return p.getCameraImage(128, 128, view_matrix, projection_matrix)
+    return p.getCameraImage(224, 224, view_matrix, projection_matrix)
 
 
 def move(joints):
@@ -99,12 +94,21 @@ def camera_coords_in_img_coords(pos):
 
 
 def create_dataset():
-    img_data = p.loadURDF("img.urdf", [x_img, y_img, z_img], globalScaling=1, useFixedBase=True)
-    #textureId = p.loadTexture("bubbly.jpg")  #nefunguje mi (Míra)
-    #p.changeVisualShape(img, -1, textureUniqueId=textureId)
+    img = p.loadURDF("img.urdf", [x_img, y_img, z_img], globalScaling=1, useFixedBase=True)
+    textureId = p.loadTexture("pls.png")  #nefunguje mi (Míra)
+    p.changeVisualShape(img, -1, textureUniqueId=textureId)
+
+    # joints = p.calculateInverseKinematics(kukaId, 6, [x_img, y_img, z_img + arm_distance],
+    #                                       p.getQuaternionFromEuler([np.pi, 0, 0]), maxNumIterations=100)
+    # joints = np.array([0, 0.5, 0, -1.5, 0, 1.15, -math.pi/2])
+    # move(joints)
 
     joints = np.array([0, 0.5, 0, -1.5, 0, 1.15, -math.pi/2])
     move(joints)
+    # img_data, pos1, camera_vector = img_wrapper(kukaId)
+    # time.sleep(10)
+    # d.save_data(kukaId, num=999999, img_data=img_data)
+    # return
 
     X, Y, Z = gnr.generate_position(x_img, x_width, y_img, y_width, z_img + arm_distance, z_width, sample_size)
     oriantations = gnr.generate_camera_angles(sigma=angles_width, sample_size=sample_size)
@@ -116,11 +120,11 @@ def create_dataset():
         joints = p.calculateInverseKinematics(kukaId, 6, pos, orn, maxNumIterations=100)
         move(joints)
 
-        view_matrix, camvec = calc_view_matrix(pos, orn)
+        # view_matrix, camvec = calc_view_matrix(pos, orn)
         img_data, pos1, camera_vector = img_wrapper(kukaId)
 
         d.save_data(kukaId, num=k, img_data=img_data)
-        #time.sleep(1)
+        # time.sleep(10)
 
 
 if __name__ == '__main__':
